@@ -7,7 +7,7 @@ import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
 
 
 /* Profile Sidebar - Reutilizar */
-function ProfileSidebar({ githubUser, ...props }) {
+function ProfileSidebar({ githubUser }) {
   return (
     <Box>
       <img
