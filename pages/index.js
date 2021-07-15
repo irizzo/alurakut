@@ -1,5 +1,10 @@
+/* links
+  https://api.github.com/users/irizzo
+  https://dashboard.datocms.com/
+*/
+
 /* React Resources */ 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 /* Alurakut Lib */
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/AluraCommons';
@@ -33,19 +38,34 @@ function ProfileSidebar({ githubUser }) {
 
 export default function Home() {
   const githubUser = 'irizzo'
-
-  const [communities, setCommunities] = useState([{
-    id: '2021-07-13_22:10',
-    name: 'Eu odeio acordar cedo',
-    image: 'https://img10.orkut.br.com/community/4f114c4f15d34ddc5ef9f1e4c1b69768.png'
-  }]);
-
+  
   const favouritePeople = [
     'juunegreiros',
     'omariosouto',
     'peas',
     'marcobrunodev'
   ]
+  const [communities, setCommunities] = useState([{
+    id: '2021-07-13_22:10',
+    name: 'Eu odeio acordar cedo',
+    image: 'https://img10.orkut.br.com/community/4f114c4f15d34ddc5ef9f1e4c1b69768.png'
+  }]);
+ 
+  const [followers, setFollowers] = useState([])
+  useEffect(() => {
+    // Pegar o array de dados do github
+    fetch(`https://api.github.com/users/${githubUser}/followers`)
+    .then((res) => {
+      return res.json()
+    })
+    .then((data) => {
+      setFollowers(data)
+    })
+    .catch((error) => {
+      console.error(`Erro> ${error}`)
+    })
+  }, [])
+  // o segundo parâmetro do useEffect serve para dizermos quando ele será executado. [] quer dizer 1 vez só, ao carregar a página.  
 
   return (
     <>
@@ -107,12 +127,12 @@ export default function Home() {
           <h2 className="smallTitle">Pessoas ({favouritePeople.length})</h2>
   
           <ul>
-            {favouritePeople.map((item) => {
+            {favouritePeople.map((p) => {
               return (
-                <li key={item}>
-                  <a href={`/users/${item}`}>
-                      <img src={`https://github.com/${item}.png`} />
-                      <span>{item}</span>
+                <li key={p}>
+                  <a href={`https://github.com/${p}`}>
+                      <img src={`https://github.com/${p}.png`} />
+                      <span>{p}</span>
                     </a>
                 </li>
               )
@@ -123,12 +143,29 @@ export default function Home() {
         <ProfileRelationsBoxWrapper>
           <h2 className="smallTitle">Comunidades ({communities.length})</h2>
           <ul>
-            {communities.map((item) => {
+            {communities.map((community) => {
               return (
-                <li key={item.id}>
+                <li key={community.id}>
                   <a>
-                      <img src={item.image} />
-                      <span>{item.name}</span>
+                      <img src={community.image} />
+                      <span>{community.name}</span>
+                    </a>
+                </li>
+              )
+            })}
+          </ul>
+        </ProfileRelationsBoxWrapper>
+
+        <ProfileRelationsBoxWrapper>
+          <h2 className="smallTitle">Seguidores do Github ({followers.length})</h2>
+          <ul>
+            {/* TODO - colocar limite de 6 itens */}
+            {followers.map((follower) => {
+              return (
+                <li key={follower.login}>
+                  <a href={`https://github.com/${follower.login}`}>
+                      <img src={`https://github.com/${follower.login}.png`} />
+                      <span>{follower.login}</span>
                     </a>
                 </li>
               )
