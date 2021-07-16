@@ -45,11 +45,7 @@ export default function Home() {
     'peas',
     'marcobrunodev'
   ]
-  const [communities, setCommunities] = useState([{
-    id: '2021-07-13_22:10',
-    name: 'Eu odeio acordar cedo',
-    image: 'https://img10.orkut.br.com/community/4f114c4f15d34ddc5ef9f1e4c1b69768.png'
-  }]);
+  const [communities, setCommunities] = useState([]);
  
   const [followers, setFollowers] = useState([])
   useEffect(() => {
@@ -63,6 +59,29 @@ export default function Home() {
     })
     .catch((error) => {
       console.error(`Erro> ${error}`)
+    })
+
+    // API GraphQL
+    fetch('https://graphql.datocms.com/', {
+      method: 'POST',
+      headers: {
+        'Authorization': '31c0083dfb8539170dcb539f51be99',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ "query": `query {
+        allCommunities {
+          id
+          title
+          imageUrl
+          creatorSlug
+        }
+      }`})
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      const bdCommunities = data.data.allCommunities
+      setCommunities(bdCommunities)
     })
   }, [])
   // o segundo parâmetro do useEffect serve para dizermos quando ele será executado. [] quer dizer 1 vez só, ao carregar a página.  
@@ -89,12 +108,28 @@ export default function Home() {
             e.preventDefault();
 
             const data = new FormData(e.target)
+            const newCommunity = {
+              title: data.get('title'),
+              imageUrl: data.get('imageUrl'),
+              creatorSlug: githubUser
+            }
 
-            // spread do array COMMUNITIES
-            const newCommunities = [
-              ...communities, 
-              { id: new Date().toISOString, name: data.get('title'), image: data.get('image-url')}]
-            setCommunities(newCommunities)
+            fetch('/api/communities', {
+              method: 'POST',
+              headers:{
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(newCommunity)
+            })
+            .then(async (res) => {
+              const data = await res.json;
+              const createdCommunity = data.createdCommunity
+              
+              // spread do array COMMUNITIES
+              const allCommunities = [...communities, newCommunity]
+              setCommunities(allCommunities)
+            })
+
           }}
           >
             <div>
@@ -109,11 +144,21 @@ export default function Home() {
             <div>
               <input
                 placeholder="Coloque uma URL para usarmos de capa"
-                name="image-url"
+                name="imageUrl"
                 aria-label="Coloque uma URL para usarmos de capa"
                 type="url"
               />
             </div>
+
+            {/* <div>
+              <input
+                placeholder="Quem está criando a Comunidade?"
+                name="creatorSlug"
+                aria-label="Quem está criando a Comunidade?"
+                type="text"
+              />
+            </div> */}
+
 
             <button>
               Criar comunidade
@@ -146,9 +191,9 @@ export default function Home() {
             {communities.map((community) => {
               return (
                 <li key={community.id}>
-                  <a>
-                      <img src={community.image} />
-                      <span>{community.name}</span>
+                  <a href={`/communities/${community.id}`}>
+                      <img src={community.imageUrl} />
+                      <span>{community.title}</span>
                     </a>
                 </li>
               )
