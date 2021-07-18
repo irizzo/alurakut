@@ -1,10 +1,7 @@
-/* links
-  https://api.github.com/users/irizzo
-  https://dashboard.datocms.com/
-*/
-
 /* React Resources */ 
 import React, { useState, useEffect } from 'react';
+import nookies from 'nookies'
+import jwt from 'jsonwebtoken'
 
 /* Alurakut Lib */
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/AluraCommons';
@@ -16,7 +13,7 @@ import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
 
 function ProfileSidebar({ githubUser }) {
   return (
-    // semanticamente é aside agora, 
+    // semanticamente é aside agora
     <Box as="aside">
       <img
         src={`https://github.com/${githubUser}.png`}
@@ -36,10 +33,11 @@ function ProfileSidebar({ githubUser }) {
   )
 }
 
-export default function Home() {
-  const githubUser = 'irizzo'
+export default function Home(props) {
+  const githubUser = props.githubUser
   
   const favouritePeople = [
+    'gabrielrizzo',
     'juunegreiros',
     'omariosouto',
     'peas',
@@ -126,10 +124,9 @@ export default function Home() {
               const createdCommunity = data.createdCommunity
               
               // spread do array COMMUNITIES
-              const allCommunities = [...communities, newCommunity]
+              const allCommunities = [...communities, createdCommunity]
               setCommunities(allCommunities)
             })
-
           }}
           >
             <div>
@@ -149,17 +146,6 @@ export default function Home() {
                 type="url"
               />
             </div>
-
-            {/* <div>
-              <input
-                placeholder="Quem está criando a Comunidade?"
-                name="creatorSlug"
-                aria-label="Quem está criando a Comunidade?"
-                type="text"
-              />
-            </div> */}
-
-
             <button>
               Criar comunidade
             </button>
@@ -222,3 +208,32 @@ export default function Home() {
     </>
   )
 }
+
+export async function getServerSideProps(context) {
+  const cookies = nookies.get(context)
+  const token = cookies.USER_TOKEN;
+  const { isAuthenticated } = await fetch('http://localhost:3000/api/auth', {
+    headers: {
+        Authorization: token
+      }
+  })
+  .then((res) => res.json())
+
+  if(!isAuthenticated) {
+    console.log('isAuthenticated = false')
+    
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      }
+    }
+  }
+
+  const { githubUser } = jwt.decode(token);
+  return {
+    props: {
+      githubUser
+    },
+  }
+} 
