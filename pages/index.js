@@ -158,15 +158,17 @@ export default function Home(props) {
           <h2 className="smallTitle">Pessoas ({favouritePeople.length})</h2>
   
           <ul>
-            {favouritePeople.map((p) => {
-              return (
-                <li key={p}>
-                  <a href={`https://github.com/${p}`}>
-                      <img src={`https://github.com/${p}.png`} />
-                      <span>{p}</span>
-                    </a>
-                </li>
-              )
+            {favouritePeople.map((p, index) => {
+              if (index < 6) {
+                return (
+                  <li key={p}>
+                    <a href={`https://github.com/${p}`}>
+                        <img src={`https://github.com/${p}.png`} />
+                        <span>{p}</span>
+                      </a>
+                  </li>
+                )
+              }
             })}
           </ul>
         </ProfileRelationsBoxWrapper>
@@ -174,15 +176,17 @@ export default function Home(props) {
         <ProfileRelationsBoxWrapper>
           <h2 className="smallTitle">Comunidades ({communities.length})</h2>
           <ul>
-            {communities.map((community) => {
-              return (
-                <li key={community.id}>
-                  <a href={`/communities/${community.id}`}>
-                      <img src={community.imageUrl} />
-                      <span>{community.title}</span>
-                    </a>
-                </li>
-              )
+            {communities.map((community, index) => {
+              if (index < 6) {
+                return (
+                  <li key={community.id}>
+                    <a href={`/communities/${community.id}`}>
+                        <img src={community.imageUrl} />
+                        <span>{community.title}</span>
+                      </a>
+                  </li>
+                )
+              }
             })}
           </ul>
         </ProfileRelationsBoxWrapper>
@@ -190,16 +194,17 @@ export default function Home(props) {
         <ProfileRelationsBoxWrapper>
           <h2 className="smallTitle">Seguidores do Github ({followers.length})</h2>
           <ul>
-            {/* TODO - colocar limite de 6 itens */}
-            {followers.map((follower) => {
-              return (
-                <li key={follower.login}>
-                  <a href={`https://github.com/${follower.login}`}>
-                      <img src={`https://github.com/${follower.login}.png`} />
-                      <span>{follower.login}</span>
-                    </a>
-                </li>
-              )
+            {followers.map((follower, index) => {
+              if (index < 6) {
+                return (
+                  <li key={follower.login}>
+                    <a href={`https://github.com/${follower.login}`}>
+                        <img src={`https://github.com/${follower.login}.png`} />
+                        <span>{follower.login}</span>
+                      </a>
+                  </li>
+                )
+              }
             })}
           </ul>
         </ProfileRelationsBoxWrapper>
